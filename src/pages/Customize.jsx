@@ -1,16 +1,22 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import tanBagImg from '../assets/customize-tan-bag.jpg'
-import blackBagImg from '../assets/hero-bag.jpg'
 import products from '../data/product'
 import { useShop } from '../context/ShopContext'
+import apexTanImg from '../assets/products/apex-modular-tan.jpg'
+import sveltoTanImg from '../assets/products/svelto-tote-tan.jpg'
+import veloceTanImg from '../assets/products/veloce-backpack-tan.jpg'
+
+// Map each customizable product to its leather color variants
+const productVariantImages = {
+  1: { tan: apexTanImg },
+  2: { tan: sveltoTanImg },
+  6: { tan: veloceTanImg },
+}
 
 // Leather colors configuration
 const leatherColors = [
-  { id: 'tan', label: 'Rich Tan', subtitle: 'Saddle Bridle', hex: '#8B4513', price: 0, image: tanBagImg },
-  { id: 'black', label: 'Matte Black', subtitle: 'Obsidian Grain', hex: '#1C1C1C', price: 0, image: blackBagImg },
-  // { id: 'beige', label: 'Beige', subtitle: 'Sand Canvas', hex: '#D2B48C', price: 0, image: tanBagImg },
-  // { id: 'olive', label: ' Olive', subtitle: 'Patina Wax', hex: '#556B2F', price: 0, image: blackBagImg }
+  { id: 'tan', label: 'Rich Tan', subtitle: 'Saddle Bridle', hex: '#8B4513', price: 0 },
+  { id: 'black', label: 'Matte Black', subtitle: 'Obsidian Grain', hex: '#1C1C1C', price: 0 },
 ]
 
 const customizableProducts = products.filter(
@@ -67,6 +73,12 @@ function Customize() {
   const totalPrice = basePrice + strapCost + sleeveCost + pocketCost + monogramCost
 
   
+  // Determine active preview image based on model and selected leather tone
+  const activeImage =
+    selectedLeather.id === 'tan' && productVariantImages[selectedProduct.id]?.tan
+      ? productVariantImages[selectedProduct.id].tan
+      : selectedProduct.image
+
   function handleOrder() {
     const customization = {
       leather: selectedLeather.label,
@@ -79,7 +91,7 @@ function Customize() {
     }
 
     addCustomizedToCart(
-      selectedProduct,
+      { ...selectedProduct, image: activeImage },
       customization,
       totalPrice
     )
@@ -125,13 +137,40 @@ function Customize() {
                 <span className="canvas-edition">EDITION 08/25</span>
               </div>
 
-              <div className="canvas-image-wrap">
+              <div className="canvas-image-wrap" style={{ position: 'relative' }}>
                 <img
-                  src={selectedProduct.image}
-                  alt={selectedProduct.name}
+                  src={activeImage}
+                  alt={`${selectedProduct.name} in ${selectedLeather.label}`}
                   className="canvas-image"
                 />
+
+                {/* Live Monogram Atelier Tag Overlay */}
+                {monogramEnabled && initials.trim() && (
+                  <div
+                    className="canvas-monogram-tag"
+                    style={{
+                      position: 'absolute',
+                      bottom: '24px',
+                      right: '24px',
+                      padding: '8px 16px',
+                      backgroundColor: selectedLeather.hex,
+                      color: stampingFinish === 'gold' ? '#FFD700' : 'rgba(255, 255, 255, 0.75)',
+                      border: stampingFinish === 'gold' ? '1px solid #D4AF37' : '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '3px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+                      fontSize: '0.85rem',
+                      fontFamily: 'monospace',
+                      fontWeight: 700,
+                      letterSpacing: '0.2em',
+                      textShadow: stampingFinish === 'gold' ? '0 1px 2px rgba(0,0,0,0.6)' : 'none',
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    🏷 {initials.toUpperCase()}
+                  </div>
+                )}
               </div>
+
 
               <div className="canvas-status-bar">
                 <span className="status-dot"></span>

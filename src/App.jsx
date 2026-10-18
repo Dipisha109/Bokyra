@@ -15,6 +15,8 @@ import Register from './pages/Register'
 import Shop from './pages/Shop'
 import Wishlist from './pages/Wishlist'
 import { ShopProvider } from './context/ShopContext'
+import Checkout from './pages/Checkout'
+
 
 
 function App() {
@@ -35,6 +37,8 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/checkout" element={<Checkout />} />
+
         </Routes>
 
         <Footer />

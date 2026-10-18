@@ -71,7 +71,7 @@ function Cart() {
                 const product = item.product
 
                 return (
-                  <div className="cart-item" key={product.id}>
+                  <div className="cart-item" key={item.cartItemId ?? product.id}>
                     <Link to={`/shop/${product.id}`}>
                       <img
                         src={product.image}
@@ -93,7 +93,7 @@ function Cart() {
                         NPR {product.price.toLocaleString()}
                       </p>
 
-                      
+
                       {item.customization && (
                         <div className="cart-customization-details">
                           <p>
@@ -134,10 +134,6 @@ function Cart() {
                         </div>
                       )}
 
-
-                      <p>
-                        NPR {product.price.toLocaleString()}
-                      </p>
 
                       <div className="cart-item-actions">
                         <div className="pd-quantity">
@@ -215,15 +211,13 @@ function Cart() {
                 Delivery charges, if applicable, will be confirmed at checkout.
               </p>
 
-              <button
-                type="button"
+              <Link
+                to="/checkout"
                 className="btn btn-primary cart-checkout-btn"
-                onClick={() =>
-                  alert('Checkout will be implemented in the next stage.')
-                }
               >
                 Proceed to Checkout
-              </button>
+              </Link>
+
 
               <Link to="/shop" className="cart-continue-link">
                 Continue Shopping

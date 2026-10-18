@@ -29,23 +29,34 @@ export function ShopProvider({ children }) {
     localStorage.setItem('bokyra_wishlist', JSON.stringify(wishlist))
   }, [wishlist])
 
+  
   function addToCart(product, quantity = 1) {
     setCart((currentCart) => {
       const existingItem = currentCart.find(
-        (item) => item.product.id === product.id
+        (item) =>
+          item.product.id === product.id &&
+          !item.customization
       )
 
       if (existingItem) {
         return currentCart.map((item) =>
-          item.product.id === product.id
+          item.product.id === product.id && !item.customization
             ? { ...item, quantity: item.quantity + quantity }
             : item
         )
       }
 
-      return [...currentCart, { product, quantity }]
+      return [
+        ...currentCart,
+        {
+          cartItemId: `regular-${product.id}-${Date.now()}`,
+          product,
+          quantity,
+        },
+      ]
     })
   }
+
 
 
   function addCustomizedToCart(product, customization, totalPrice) {

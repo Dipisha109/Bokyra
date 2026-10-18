@@ -68,9 +68,11 @@ function Wishlist() {
                 key={product.id}
                 id={product.id}
                 name={product.name}
-                category={product.category}
+                category={product.displayCategory || product.category}
                 price={product.price}
                 image={product.image}
+                stockStatus={product.stockStatus}
+                customizable={product.customizable}
               />
             ))}
           </div>

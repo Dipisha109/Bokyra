@@ -16,7 +16,7 @@ return (
     <div className="product-image-wrap">
       {customizable && stockStatus === 'In Stock' && (
         <Link
-          to={`/customize?product=${id}`}
+          to={`/customize?productId=${id}`}
           className="customizable-badge"
           onClick={(e) => e.stopPropagation()}
         >

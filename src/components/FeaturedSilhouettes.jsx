@@ -32,6 +32,8 @@ function FeaturedSilhouettes() {
               category={product.displayCategory || product.category}
               price={product.price}
               image={product.image}
+              stockStatus={product.stockStatus}
+              customizable={product.customizable}
             />
           ))}
         </div>
