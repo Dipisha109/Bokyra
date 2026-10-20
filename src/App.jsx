@@ -16,6 +16,7 @@ import Shop from './pages/Shop'
 import Wishlist from './pages/Wishlist'
 import { ShopProvider } from './context/ShopContext'
 import Checkout from './pages/Checkout'
+import OrderConfirmation from './pages/OrderConfirmation'
 
 
 
@@ -38,6 +39,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/order-confirmation" element={<OrderConfirmation />} />
 
         </Routes>
 

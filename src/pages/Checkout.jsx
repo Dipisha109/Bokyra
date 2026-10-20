@@ -4,7 +4,7 @@ import { useShop } from '../context/ShopContext'
 
 function Checkout() {
   const navigate = useNavigate()
-  const { cart } = useShop()
+  const { cart, clearCart } = useShop()
 
   // Read logged-in user if available to pre-fill their name & email
   const loggedUser = (() => {
@@ -26,6 +26,9 @@ function Checkout() {
     notes: ''
   })
 
+  // Payment method selection ('cod' or 'digital')
+  const [paymentMethod, setPaymentMethod] = useState('cod')
+
   // Calculation
   const subtotal = cart.reduce(
     (total, item) => total + item.product.price * item.quantity,
@@ -37,6 +40,35 @@ function Checkout() {
   function handleChange(e) {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault()
+
+    const orderId = `BKR-${Date.now().toString().slice(-6)}`
+    const orderData = {
+      orderId,
+      date: new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      }),
+      customer: formData,
+      paymentMethod,
+      items: cart,
+      subtotal,
+      deliveryFee,
+      total: finalTotal,
+    }
+
+    // Save order details to localStorage for the Order Confirmation page
+    localStorage.setItem('bokyra_latest_order', JSON.stringify(orderData))
+
+    // Clear the cart
+    clearCart()
+
+    // Navigate to Order Confirmation
+    navigate('/order-confirmation')
   }
 
   // If cart is empty, redirect user gently
@@ -59,19 +91,16 @@ function Checkout() {
         {/* Page Header */}
         <div style={{ marginBottom: '32px' }}>
           <p className="eyebrow">&bull; ATELIER ORDER &bull; DISPATCH IN NEPAL</p>
-          <h1 className="section-title">Shipping & Delivery</h1>
+          <h1 className="section-title">Shipping & Payment</h1>
         </div>
 
         <div className="checkout-grid">
           
-          {/* Left Column: Delivery Form */}
+          {/* Left Column: Delivery & Payment Form */}
           <section className="checkout-card">
-            <h2 className="checkout-title">1. Delivery Information</h2>
+            <form onSubmit={handleSubmit}>
+              <h2 className="checkout-title">1. Delivery Information</h2>
 
-            <form onSubmit={(e) => {
-              e.preventDefault()
-              alert('Form submitted! Next step will connect payment method.')
-            }}>
               <div className="form-row">
                 <div>
                   <label className="checkout-label">Full Name *</label>
@@ -131,7 +160,7 @@ function Checkout() {
                 </div>
               </div>
 
-              <div style={{ marginBottom: '24px' }}>
+              <div style={{ marginBottom: '32px' }}>
                 <label className="checkout-label">Street / Area Address *</label>
                 <textarea
                   name="address"
@@ -145,8 +174,43 @@ function Checkout() {
                 />
               </div>
 
+              {/* Payment Method Selection */}
+              <div style={{ marginBottom: '28px' }}>
+                <h2 className="checkout-title">2. Select Payment Method</h2>
+
+                <div className="payment-grid">
+                  <div
+                    className={`payment-card ${paymentMethod === 'cod' ? 'active' : ''}`}
+                    onClick={() => setPaymentMethod('cod')}
+                  >
+                    <div className="payment-card-header">
+                      <span className="payment-card-title">💵 Cash on Delivery</span>
+                      <span className="payment-demo-badge">POPULAR</span>
+                    </div>
+                    <p className="payment-card-desc">
+                      Pay in cash or mobile QR scan at your doorstep upon receiving your bag.
+                    </p>
+                  </div>
+
+                  <div
+                    className={`payment-card ${paymentMethod === 'digital' ? 'active' : ''}`}
+                    onClick={() => setPaymentMethod('digital')}
+                  >
+                    <div className="payment-card-header">
+                      <span className="payment-card-title">📱 Digital Payment (Demo)</span>
+                      <span className="payment-demo-badge">SIMULATED</span>
+                    </div>
+                    <p className="payment-card-desc">
+                      Simulate payment via eSewa, Khalti, or Fonepay (No real money deducted).
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '16px' }}>
-                CONTINUE TO PAYMENT &rarr;
+                {paymentMethod === 'cod'
+                  ? 'CONFIRM ORDER (CASH ON DELIVERY) →'
+                  : 'CONFIRM SIMULATED PAYMENT →'}
               </button>
             </form>
           </section>

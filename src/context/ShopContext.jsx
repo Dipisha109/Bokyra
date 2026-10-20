@@ -104,6 +104,10 @@ export function ShopProvider({ children }) {
     )
   }
 
+  function clearCart() {
+    setCart([])
+  }
+
   const cartCount = cart.reduce(
     (total, item) => total + item.quantity,
     0
@@ -118,6 +122,7 @@ export function ShopProvider({ children }) {
     updateQuantity,
     toggleWishlist,
     addCustomizedToCart,
+    clearCart,
   }
 
   return (

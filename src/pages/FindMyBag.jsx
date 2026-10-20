@@ -144,48 +144,53 @@ function FindMyBag() {
           reasons.push(`Versatile ${product.capacityLiters}L capacity`)
         }
 
-        // 3. Evaluate Laptop Match
+                // 3. Evaluate Laptop Match
         if (q3 === 'Large Laptop (14–16")') {
           if (product.laptopFit === '14–16"') {
-            score += 25
-            reasons.push('Padded protection fits up to 16" laptops')
+            score += 35
+            reasons.push('Dedicated compartment fits up to 16" laptops')
+          } else if (product.laptopFit === '13" or smaller') {
+            score += 5
           } else {
-            score -= 20
+            // Disqualify bags with no laptop support when user explicitly requires a laptop
+            score -= 60
           }
         } else if (q3 === 'Compact Device (13" or iPad)') {
           if (product.laptopFit === '14–16"' || product.laptopFit === '13" or smaller') {
-            score += 25
-            reasons.push('Fits 13" devices and tablets comfortably')
+            score += 30
+            reasons.push('Safely accommodates 13" devices and tablets')
+          } else {
+            score -= 40
           }
         } else if (q3 === 'No Laptop Needed') {
           if (product.laptopFit === 'No laptop') {
-            score += 25
-            reasons.push('Minimalist setup without bulky tech dividers')
+            score += 35
+            reasons.push('Lightweight profile without bulky laptop dividers')
           } else {
             score += 15
           }
         } else {
-          // Sometimes
+          // Flexible
           score += 20
         }
 
         // 4. Evaluate Silhouette Match
         if (q4 === 'Backpack' && product.silhouette === 'Backpack') {
-          score += 20
+          score += 30
           reasons.push('Ergonomic dual-shoulder backpack straps')
         } else if (q4 === 'Structured Tote' && product.silhouette === 'Tote') {
-          score += 20
+          score += 30
           reasons.push('Clean vertical tote architecture')
         } else if (q4 === 'Sling / Crossbody' && (product.silhouette === 'Sling / Crossbody' || product.silhouette === 'Sling')) {
-          score += 20
-          reasons.push('Agile crossbody sling profile')
+          score += 30
+          reasons.push('Agile hands-free crossbody sling profile')
         } else if (q4 === 'Briefcase or Duffel' && (product.silhouette === 'Briefcase' || product.silhouette === 'Duffel')) {
-          score += 20
-          reasons.push('Refined hand-carry & luggage silhouette')
+          score += 30
+          reasons.push('Executive hand-carry & luggage silhouette')
         }
 
-        // Calculate final percentage (clamped between 68% and 99%)
-        const percentage = Math.min(99, Math.max(68, Math.round((score / 105) * 100)))
+        // Honest percentage calculation based on actual positive criteria
+        const percentage = Math.min(99, Math.max(25, Math.round((Math.max(0, score) / 125) * 100)))
 
         return {
           ...product,
@@ -193,6 +198,7 @@ function FindMyBag() {
           matchReasons: reasons.slice(0, 3)
         }
       })
+      .filter((product) => product.matchReasons.length > 0) // Only recommend bags that genuinely match criteria!
       .sort((a, b) => b.matchScore - a.matchScore)
   }, [answers, showResults])
 
@@ -213,56 +219,75 @@ function FindMyBag() {
             </p>
           </div>
 
-          {/* Top Matches Showcase */}
-          <div className="fmb-results-grid">
-            {topMatches.map((product, idx) => (
-              <div className="fmb-result-card" key={product.id}>
-                {/* Match Badge */}
-                <div className="fmb-badge-row">
-                  <span className={`fmb-match-pill ${idx === 0 ? 'top-match' : ''}`}>
-                    {idx === 0 ? '★ BEST MATCH' : `RUNNER UP #${idx + 1}`} &bull; {product.matchScore}% FIT
-                  </span>
-                  <span className="fmb-liters-pill">{product.displayCategory}</span>
-                </div>
-
-                <div className="fmb-card-media">
-                  <Link to={`/shop/${product.id}`}>
-                    <img src={product.image} alt={product.name} className="fmb-product-img" />
-                  </Link>
-                </div>
-
-                <div className="fmb-card-body">
-                  <h3 className="fmb-product-title">
-                    <Link to={`/shop/${product.id}`}>{product.name}</Link>
-                  </h3>
-
-                  <p className="fmb-product-desc">{product.description}</p>
-
-                  {/* Why it matches list */}
-                  <div className="fmb-reasons">
-                    <span className="fmb-reasons-label">Why it fits you:</span>
-                    <ul>
-                      {product.matchReasons.map((reason, rIdx) => (
-                        <li key={rIdx}>✓ {reason}</li>
-                      ))}
-                    </ul>
+          {/* Top Matches Showcase or Empty Fallback */}
+          {topMatches.length > 0 ? (
+            <div className="fmb-results-grid">
+              {topMatches.map((product, idx) => (
+                <div className="fmb-result-card" key={product.id}>
+                  {/* Match Badge */}
+                  <div className="fmb-badge-row">
+                    <span className={`fmb-match-pill ${idx === 0 ? 'top-match' : ''}`}>
+                      {idx === 0 ? '★ BEST MATCH' : `RUNNER UP #${idx + 1}`} &bull; {product.matchScore}% FIT
+                    </span>
+                    <span className="fmb-liters-pill">{product.displayCategory}</span>
                   </div>
 
-                  <div className="fmb-footer">
-                    <span className="fmb-price">NPR {product.price.toLocaleString()}</span>
-                    <div className="fmb-actions-row">
-                      <Link to={`/shop/${product.id}`} className="btn btn-primary fmb-view-btn">
-                        View Details &rarr;
-                      </Link>
-                      <Link to="/customize" className="btn btn-secondary fmb-custom-btn" title="Personalize this style">
-                        Make It Yours
-                      </Link>
+                  <div className="fmb-card-media">
+                    <Link to={`/shop/${product.id}`}>
+                      <img src={product.image} alt={product.name} className="fmb-product-img" />
+                    </Link>
+                  </div>
+
+                  <div className="fmb-card-body">
+                    <h3 className="fmb-product-title">
+                      <Link to={`/shop/${product.id}`}>{product.name}</Link>
+                    </h3>
+
+                    <p className="fmb-product-desc">{product.description}</p>
+
+                    {/* Why it matches list */}
+                    <div className="fmb-reasons">
+                      <span className="fmb-reasons-label">Why it fits you:</span>
+                      <ul>
+                        {product.matchReasons.map((reason, rIdx) => (
+                          <li key={rIdx}>✓ {reason}</li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="fmb-footer">
+                      <span className="fmb-price">NPR {product.price.toLocaleString()}</span>
+                      <div className="fmb-actions-row">
+                        <Link to={`/shop/${product.id}`} className="btn btn-primary fmb-view-btn">
+                          View Details &rarr;
+                        </Link>
+                        {product.customizable && product.stockStatus === 'In Stock' && (
+                          <Link 
+                            to={`/customize?productId=${product.id}`} 
+                            className="btn btn-secondary fmb-custom-btn" 
+                            title="Personalize this style"
+                          >
+                            Make It Yours
+                          </Link>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="shop-empty-state" style={{ margin: '40px auto', textAlign: 'center', maxWidth: '500px' }}>
+              <div style={{ fontSize: '2.5rem', marginBottom: '16px' }}>🎒</div>
+              <h3>No Exact Matches Found</h3>
+              <p style={{ color: 'var(--text-muted)', margin: '12px 0 24px' }}>
+                We couldn't find a silhouette matching that exact combination. Try adjusting your answers or explore our full atelier catalog.
+              </p>
+              <button type="button" className="btn btn-primary" onClick={handleRestart}>
+                Retake Quiz ↺
+              </button>
+            </div>
+          )}
 
           {/* Other Alternative Silhouettes */}
           {runnerUps.length > 0 && (

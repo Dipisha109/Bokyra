@@ -2922,3 +2922,68 @@ img {
     grid-template-columns: 1fr;
   }
 }
+
+/* Payment Option Cards */
+.payment-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 600px) {
+  .payment-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.payment-card {
+  border: 1px solid var(--border-light);
+  background-color: var(--bg-primary);
+  padding: 18px 20px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.payment-card:hover {
+  border-color: var(--text-primary);
+}
+
+.payment-card.active {
+  border-color: var(--text-primary);
+  background-color: var(--bg-card);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.payment-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.payment-card-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+}
+
+.payment-card-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.payment-demo-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  background-color: var(--bg-muted);
+  color: var(--text-secondary);
+  padding: 2px 6px;
+  border-radius: 2px;
+}
