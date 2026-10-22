@@ -21,11 +21,11 @@ function Footer() {
           <div className="footer-links-col">
             <h4 className="footer-heading">SHOP</h4>
             <ul className="footer-list">
-              <li><Link to="/shop">All Bags</Link></li>
-              <li><Link to="/shop">Backpacks</Link></li>
-              <li><Link to="/shop">Totes</Link></li>
-              <li><Link to="/shop">Slings</Link></li>
-              <li><Link to="/shop">Accessories</Link></li>
+              <li><Link to="/shop">All Silhouettes</Link></li>
+              <li><Link to="/shop?category=Backpack">Backpacks</Link></li>
+              <li><Link to="/shop?category=Tote">Totes</Link></li>
+              <li><Link to="/shop?category=Sling%20%2F%20Crossbody">Slings & Crossbody</Link></li>
+              <li><Link to="/shop?category=Briefcase">Briefcases & Duffels</Link></li>
             </ul>
           </div>
 
@@ -33,9 +33,10 @@ function Footer() {
           <div className="footer-links-col">
             <h4 className="footer-heading">DISCOVER</h4>
             <ul className="footer-list">
-              <li><Link to="/find-my-bag">Find My Bag</Link></li>
-              <li><Link to="/customize">Customization </Link></li>
-              <li><Link to="/about">About BOKYRA</Link></li>
+              <li><Link to="/find-my-bag">Find My Bag Quiz</Link></li>
+              <li><Link to="/customize">Personalized Customizer</Link></li>
+              <li><Link to="/about">About The Atelier</Link></li>
+              <li><Link to="/wishlist">Your Wishlist</Link></li>
             </ul>
           </div>
 
@@ -43,10 +44,10 @@ function Footer() {
           <div className="footer-links-col">
             <h4 className="footer-heading">CUSTOMER CARE</h4>
             <ul className="footer-list">
-              <li><Link to="/about">Delivery</Link></li>
-              <li><Link to="/about">Care & Repair</Link></li>
-              <li><Link to="/about">Warranty</Link></li>
-              <li><Link to="/about">Contact Us</Link></li>
+              <li><Link to="/about#delivery">Delivery Across Nepal</Link></li>
+              <li><Link to="/about#care">Leather Care Guide</Link></li>
+              <li><Link to="/about#warranty">Lifetime Warranty</Link></li>
+              <li><Link to="/about#contact">Contact Atelier</Link></li>
             </ul>
           </div>
 
@@ -55,12 +56,12 @@ function Footer() {
         {/* Footer Bottom Bar */}
         <div className="footer-bottom">
           <p className="footer-copyright">
-            &copy; 2026 BOKYRA. All rights reserved.
+            &copy; 2026 BOKYRA Atelier. All rights reserved. Kathmandu, Nepal.
           </p>
           <div className="footer-legal-links">
-            <Link to="/about">Privacy Policy</Link>
-            <Link to="/about">Terms of Service</Link>
-            <Link to="/about">Legal</Link>
+            <Link to="/about#privacy">Privacy Policy</Link>
+            <Link to="/about#terms">Terms of Craft</Link>
+            <Link to="/about#contact">Support</Link>
           </div>
         </div>
       </div>

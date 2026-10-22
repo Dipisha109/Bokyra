@@ -17,6 +17,7 @@ import Wishlist from './pages/Wishlist'
 import { ShopProvider } from './context/ShopContext'
 import Checkout from './pages/Checkout'
 import OrderConfirmation from './pages/OrderConfirmation'
+import NotFound from './pages/NotFound'
 
 
 
@@ -31,6 +32,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/about" element={<About />} />
+          <Route path="/about-us" element={<About />} />
           <Route path="/shop/:id" element={<ProductDetails />} />
           <Route path="/find-my-bag" element={<FindMyBag />} />
           <Route path="/customize" element={<Customize />} />
@@ -40,7 +42,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
-
+          <Route path="*" element={<NotFound />} />
         </Routes>
 
         <Footer />

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import ProductCard from '../components/ProductCard'
 import products from '../data/product'
@@ -19,6 +19,57 @@ const purposeCategories = [
   { id: 'travel', label: 'Travel' },
   { id: 'everyday', label: 'Everyday / Comfort' }
 ]
+
+// Common everyday and localized synonyms for user queries (e.g., office, clg, side bag, jhola)
+const searchSynonyms = {
+  office: ['work', 'executive', 'briefcase', 'formal'],
+  school: ['college', 'backpack', 'study', 'student', 'lecture'],
+  clg: ['college', 'campus', 'backpack', 'lecture'],
+  college: ['college', 'campus', 'lecture', 'study'],
+  uni: ['college', 'campus'],
+  daily: ['everyday', 'commute', 'agile'],
+  outing: ['everyday', 'casual', 'sling', 'crossbody'],
+  casual: ['everyday', 'sling'],
+  side: ['sling', 'crossbody'],
+  gym: ['travel', 'duffel', 'weekender'],
+  tour: ['travel', 'duffel', 'trip', 'voyage'],
+  trek: ['travel', 'duffel', 'expedition'],
+  trip: ['travel', 'weekender', 'transit'],
+  flight: ['travel', 'cabin', 'tsa'],
+  jhola: ['backpack', 'tote', 'bag'],
+  bag: ['backpack', 'tote', 'sling', 'crossbody', 'briefcase', 'duffel', 'pack'],
+  bags: ['backpack', 'tote', 'sling', 'crossbody', 'briefcase', 'duffel', 'pack'],
+  laptop: ['laptop', 'sleeve', 'tech', 'macbook'],
+  macbook: ['laptop', '14–16"', '16"'],
+  rain: ['weatherproof', 'waterproof', 'water-resistant', 'storm'],
+  waterproof: ['weatherproof', 'water-resistant', 'storm', 'ballistic'],
+}
+
+// Checks if a text contains a search term or its stem / common synonyms
+function termMatchesText(text, term) {
+  if (!text || !term) return false
+  const lowerText = text.toLowerCase()
+
+  // 1. Direct substring match (e.g. "apex" in "The Apex Modular")
+  if (lowerText.includes(term)) return true
+
+  // 2. Partial prefix / typo tolerance (e.g. "backpac" matches "backpack")
+  if (term.length >= 4) {
+    const stem = term.slice(0, -1) // e.g. "backpa" from "backpac"
+    const words = lowerText.split(/[\s/–-]+/)
+    if (words.some((w) => w.startsWith(stem) || (w.length >= 4 && stem.startsWith(w.slice(0, 4))))) {
+      return true
+    }
+  }
+
+  // 3. Synonym dictionary matching (e.g. "office" matches "work", "side" matches "sling")
+  const synonyms = searchSynonyms[term] || []
+  if (synonyms.some((syn) => lowerText.includes(syn))) {
+    return true
+  }
+
+  return false
+}
 
 function Shop() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -51,6 +102,21 @@ function Shop() {
   })
   const [sortBy, setSortBy] = useState('featured')
 
+  // Keep state synchronized whenever URL search parameters change (e.g. from header search or nav dropdown)
+  useEffect(() => {
+    const q = searchParams.get('q') || searchParams.get('search') || ''
+    setSearchQuery(q)
+    const cat = searchParams.get('category') || ''
+    if (cat) {
+      const match = silhouetteCategories.find(
+        (s) => s.toLowerCase() === cat.toLowerCase()
+      )
+      if (match) setActiveSilhouette(match)
+    } else {
+      setActiveSilhouette('All Silhouettes')
+    }
+  }, [searchParams])
+
   // Reset all filters
   function handleReset() {
     setSearchQuery('')
@@ -60,41 +126,77 @@ function Shop() {
     setSearchParams({})
   }
 
-  // Filter and sort products
+  // Filter and sort products with multi-word search, partial matching, and relevance ranking
   const filteredProducts = useMemo(() => {
-    return products
-      .filter((p) => {
-        // 1. Silhouette filter
+    const cleanQuery = searchQuery.trim().toLowerCase()
+    const queryTerms = cleanQuery ? cleanQuery.split(/\s+/).filter(Boolean) : []
+
+    // 1. Filter matching products and calculate relevance score
+    const matching = products
+      .map((p) => {
+        // Silhouette filter
         const matchesSilhouette =
           activeSilhouette === 'All Silhouettes' ||
           p.category.toLowerCase() === activeSilhouette.toLowerCase() ||
           p.silhouette.toLowerCase() === activeSilhouette.toLowerCase()
 
-        // 2. Purpose filter
+        // Purpose filter
         const matchesPurpose =
           activePurpose === 'all' ||
           p.purpose.toLowerCase() === activePurpose.toLowerCase()
 
-        // 3. Search query filter
-        const cleanQuery = searchQuery.trim().toLowerCase()
-        const matchesSearch =
-          !cleanQuery ||
-          p.name.toLowerCase().includes(cleanQuery) ||
-          p.category.toLowerCase().includes(cleanQuery) ||
-          p.displayCategory.toLowerCase().includes(cleanQuery) ||
-          p.purpose.toLowerCase().includes(cleanQuery) ||
-          p.description.toLowerCase().includes(cleanQuery) ||
-          (p.highlights &&
-            p.highlights.some((h) => h.toLowerCase().includes(cleanQuery)))
+        if (!matchesSilhouette || !matchesPurpose) {
+          return null
+        }
 
-        return matchesSilhouette && matchesPurpose && matchesSearch
+        // If no search query, keep product
+        if (queryTerms.length === 0) {
+          return { product: p, relevanceScore: 0 }
+        }
+
+        const nameLower = p.name.toLowerCase()
+        const categoryLower = (p.displayCategory || p.category).toLowerCase()
+        const purposeLower = p.purpose.toLowerCase()
+        const descLower = p.description.toLowerCase()
+        const highlightsLower = (p.highlights || []).join(' ').toLowerCase()
+        const fullContent = `${nameLower} ${categoryLower} ${purposeLower} ${descLower} ${highlightsLower}`
+
+        // Multi-word: Every term (or its partial stem/synonym) must match at least one attribute
+        const allTermsMatch = queryTerms.every((term) =>
+          termMatchesText(fullContent, term)
+        )
+
+        if (!allTermsMatch) {
+          return null
+        }
+
+        // Relevance Scoring: Direct name matches score highest, then category, then features
+        let score = 0
+        if (nameLower === cleanQuery) score += 100
+        else if (nameLower.startsWith(cleanQuery)) score += 60
+
+        queryTerms.forEach((term) => {
+          if (nameLower.includes(term)) score += 35
+          if (categoryLower.includes(term)) score += 25
+          if (purposeLower.includes(term)) score += 20
+          if (descLower.includes(term) || highlightsLower.includes(term)) score += 10
+        })
+
+        return { product: p, relevanceScore: score }
       })
+      .filter(Boolean)
+
+    // 2. Sort results (respects user sort, or ranks by relevance if searching)
+    return matching
       .sort((a, b) => {
-        if (sortBy === 'price-low') return a.price - b.price
-        if (sortBy === 'price-high') return b.price - a.price
-        if (sortBy === 'rating') return b.rating - a.rating
-        return a.id - b.id // featured / default
+        if (sortBy === 'price-low') return a.product.price - b.product.price
+        if (sortBy === 'price-high') return b.product.price - a.product.price
+        if (sortBy === 'rating') return b.product.rating - a.product.rating
+        if (sortBy === 'name-az') return a.product.name.localeCompare(b.product.name)
+        if (queryTerms.length > 0) return b.relevanceScore - a.relevanceScore // Relevance first when searching
+        return a.product.id - b.product.id // Default / featured
       })
+      .map((item) => item.product)
   }, [searchQuery, activeSilhouette, activePurpose, sortBy])
 
   return (
@@ -117,7 +219,7 @@ function Shop() {
             <input
               type="text"
               className="shop-search-input"
-              placeholder="Search by bag name, material, laptop size, or purpose..."
+              placeholder="Search by name, purpose (e.g. office, college, side bag, travel)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               aria-label="Search collection"
@@ -147,8 +249,33 @@ function Shop() {
               <option value="price-low">Price: Low to High</option>
               <option value="price-high">Price: High to Low</option>
               <option value="rating">Highest Rated</option>
+              <option value="name-az">Name: A to Z</option>
             </select>
           </div>
+        </div>
+
+        {/* Quick Search Suggestions for Nepali / Everyday Users */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', margin: '-16px 0 24px', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+          <span>Popular searches:</span>
+          {['Office bag', 'College', 'Side bag', 'Laptop', 'Travel'].map((tag) => (
+            <button
+              key={tag}
+              type="button"
+              onClick={() => setSearchQuery(tag)}
+              style={{
+                background: searchQuery.toLowerCase() === tag.toLowerCase() ? 'var(--text-primary)' : 'none',
+                color: searchQuery.toLowerCase() === tag.toLowerCase() ? 'var(--bg-primary)' : 'var(--text-secondary)',
+                border: '1px solid var(--border-light)',
+                borderRadius: '12px',
+                padding: '3px 10px',
+                fontSize: '0.75rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              {tag}
+            </button>
+          ))}
         </div>
 
         {/* Filter Categories: Silhouette Types */}

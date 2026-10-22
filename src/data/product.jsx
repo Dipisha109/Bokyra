@@ -137,7 +137,7 @@ const products = [
   },
   {
     id: 8,
-    name: "The Modus Expedition Duffel 42L",
+    name: "The Modus Grand Travel Duffel 42L",
     category: "Duffel",
     stockStatus: "In Stock",
     displayCategory: "TRAVEL DUFFEL / 42 LITERS",
@@ -150,8 +150,8 @@ const products = [
     price: 9500,
     image: modusImg,
     rating: 4.9,
-    description: "High-capacity expedition duffel built for airport transit and long-haul expeditions with stowable backpack straps.",
-    highlights: ["Converts from duffel to backpack", "Weatherproof seam-taped build", "Expandable 42L volume"]
+    description: "High-capacity heritage travel duffel handcrafted in rich cognac full-grain leather, featuring reinforced carry handles, brass hardware, and a detachable padded shoulder strap.",
+    highlights: ["Hand-selected full-grain cognac leather", "TSA cabin-friendly dimensions", "Reinforced leather luggage tag & shoulder strap"]
   },
   {
     id: 9,
