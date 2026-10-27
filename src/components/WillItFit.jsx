@@ -64,12 +64,12 @@ function WillItFit({ product }) {
 
           <div className={`fit-result-badge-card ${fits ? 'fit-yes' : 'fit-no'}`}>
             <span className="fit-badge-pill">
-              {fits ? '✓ Fits Comfortably' : '✕ Exceeds Recommended Max'}
+              {fits ? '✓ Estimated Compatible' : '✕ Exceeds Listed Rating'}
             </span>
             <p className="fit-status-explanation">
               {fits
-                ? `Your ${laptopSize}" device fits easily inside the reinforced, shock-absorbing sleeve with space for your charger and accessories.`
-                : `A ${laptopSize}" device exceeds this silhouette's maximum rated capacity of ${maxSize}". Consider The Apex Modular 22L or Veloce Transit 24L for larger hardware.`}
+                ? `Based on catalog specifications, a standard ${laptopSize}" device is estimated to fit within this silhouette's compartment (rated up to ${maxSize}"). Actual fit may vary depending on device bezel and protective sleeves.`
+                : `A ${laptopSize}" device exceeds this silhouette's listed maximum rating of ${maxSize}". Consider The Apex Modular 22L or Veloce Transit 24L for larger hardware.`}
             </p>
           </div>
         </div>

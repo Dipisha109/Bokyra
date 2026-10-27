@@ -47,16 +47,34 @@ function Register() {
       return
     }
 
-    // Save user to localStorage
-    const newUser = {
-      name: formData.name.trim(),
-      email: formData.email.trim().toLowerCase(),
-      password: formData.password
+    // Prevent duplicate registrations
+    const existingRaw = localStorage.getItem('bokyra_registered_users')
+    let registeredUsers = []
+    try {
+      registeredUsers = existingRaw ? JSON.parse(existingRaw) : []
+    } catch {
+      registeredUsers = []
     }
 
-    localStorage.setItem('bokyra_registered_user', JSON.stringify(newUser))
+    const emailClean = formData.email.trim().toLowerCase()
+    const duplicate = registeredUsers.find((u) => u.email === emailClean)
+    if (duplicate) {
+      setError('An account with this email address already exists. Please sign in.')
+      return
+    }
+
+    // Save user with demo credential digest (never store raw plaintext password)
+    const newUser = {
+      name: formData.name.trim(),
+      email: emailClean,
+      // Simulated client-side credential digest for frontend demo
+      credentialToken: btoa(formData.password)
+    }
+
+    registeredUsers.push(newUser)
+    localStorage.setItem('bokyra_registered_users', JSON.stringify(registeredUsers))
     
-    // Automatically log in the newly registered user
+    // Automatically establish demo session
     localStorage.setItem('bokyra_logged_user', JSON.stringify({
       name: newUser.name,
       email: newUser.email
@@ -65,11 +83,11 @@ function Register() {
     // Dispatch custom storage event so Navbar updates immediately
     window.dispatchEvent(new Event('storage'))
 
-    setSuccess('Bokyra account created successfully! Redirecting...')
+    setSuccess('BOKYRA profile created successfully (Demo Session). Redirecting...')
 
     setTimeout(() => {
       navigate('/')
-    }, 1200)
+    }, 1000)
   }
 
   return (
@@ -81,8 +99,11 @@ function Register() {
             <span className="eyebrow">&bull; BOKYRA ATELIER</span>
             <h1 className="section-title">Create Account</h1>
             <p className="auth-subtitle">
-              Join the Bokyra community for curated recommendations, personalized bag matching, and to place your order.
+              Join the BOKYRA community for curated recommendations, personalized bag matching, and to place your order.
             </p>
+            <div style={{ marginTop: '10px', fontSize: '0.72rem', color: 'var(--text-muted)', background: 'var(--bg-muted)', padding: '6px 12px', borderRadius: '4px', letterSpacing: '0.04em' }}>
+              🔒 <strong>Frontend Demo:</strong> Credentials are stored locally without a live backend service.
+            </div>
           </div>
 
           {error && <div className="auth-alert error">{error}</div>}

@@ -178,32 +178,54 @@ function Checkout() {
               <div style={{ marginBottom: '28px' }}>
                 <h2 className="checkout-title">2. Select Payment Method</h2>
 
-                <div className="payment-grid">
-                  <div
+                <div className="payment-grid" role="radiogroup" aria-label="Payment method selection">
+                  <label
                     className={`payment-card ${paymentMethod === 'cod' ? 'active' : ''}`}
-                    onClick={() => setPaymentMethod('cod')}
+                    htmlFor="payment-cod"
                   >
                     <div className="payment-card-header">
-                      <span className="payment-card-title">💵 Cash on Delivery</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <input
+                          type="radio"
+                          id="payment-cod"
+                          name="paymentMethod"
+                          value="cod"
+                          checked={paymentMethod === 'cod'}
+                          onChange={() => setPaymentMethod('cod')}
+                          className="payment-radio"
+                        />
+                        <span className="payment-card-title">💵 Cash on Delivery</span>
+                      </div>
                       <span className="payment-demo-badge">POPULAR</span>
                     </div>
                     <p className="payment-card-desc">
                       Pay in cash or mobile QR scan at your doorstep upon receiving your bag.
                     </p>
-                  </div>
+                  </label>
 
-                  <div
+                  <label
                     className={`payment-card ${paymentMethod === 'digital' ? 'active' : ''}`}
-                    onClick={() => setPaymentMethod('digital')}
+                    htmlFor="payment-digital"
                   >
                     <div className="payment-card-header">
-                      <span className="payment-card-title">📱 Digital Payment (Demo)</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <input
+                          type="radio"
+                          id="payment-digital"
+                          name="paymentMethod"
+                          value="digital"
+                          checked={paymentMethod === 'digital'}
+                          onChange={() => setPaymentMethod('digital')}
+                          className="payment-radio"
+                        />
+                        <span className="payment-card-title">📱 Digital Payment (Demo)</span>
+                      </div>
                       <span className="payment-demo-badge">SIMULATED</span>
                     </div>
                     <p className="payment-card-desc">
                       Simulate payment via eSewa, Khalti, or Fonepay (No real money deducted).
                     </p>
-                  </div>
+                  </label>
                 </div>
               </div>
 

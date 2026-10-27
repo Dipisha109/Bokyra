@@ -30,48 +30,54 @@ function Login() {
       return
     }
 
-    // Retrieve saved user from localStorage
-    const savedUserJson = localStorage.getItem('bokyra_registered_user')
-    const savedUser = savedUserJson ? JSON.parse(savedUserJson) : null
+    // Retrieve registered users from localStorage
+    const existingRaw = localStorage.getItem('bokyra_registered_users')
+    let registeredUsers = []
+    try {
+      registeredUsers = existingRaw ? JSON.parse(existingRaw) : []
+    } catch {
+      registeredUsers = []
+    }
 
-    if (
-      savedUser &&
-      savedUser.email === formData.email.trim().toLowerCase() &&
-      savedUser.password === formData.password
-    ) {
+    // Support legacy single-user key if present
+    const legacyUserJson = localStorage.getItem('bokyra_registered_user')
+    if (legacyUserJson) {
+      try {
+        const legacy = JSON.parse(legacyUserJson)
+        if (legacy && !registeredUsers.some((u) => u.email === legacy.email)) {
+          registeredUsers.push({
+            name: legacy.name,
+            email: legacy.email,
+            credentialToken: legacy.credentialToken || btoa(legacy.password || '')
+          })
+        }
+      } catch {
+        // ignore malformed legacy
+      }
+    }
+
+    const emailClean = formData.email.trim().toLowerCase()
+    const passwordToken = btoa(formData.password)
+
+    const matchedUser = registeredUsers.find(
+      (u) => u.email === emailClean && u.credentialToken === passwordToken
+    )
+
+    if (matchedUser) {
       // Successful match
       localStorage.setItem('bokyra_logged_user', JSON.stringify({
-        name: savedUser.name,
-        email: savedUser.email
+        name: matchedUser.name,
+        email: matchedUser.email
       }))
 
       window.dispatchEvent(new Event('storage'))
-      setSuccess(`Welcome back, ${savedUser.name}!`)
+      setSuccess(`Welcome back, ${matchedUser.name}!`)
 
       setTimeout(() => {
         navigate('/')
       }, 1000)
     } else {
-      // Fallback demo simulation if user hasn't registered yet or wants quick test
-      if (!savedUser) {
-        // Quick demo login: create instant session
-        const fallbackName = formData.email.split('@')[0] || 'Collector'
-        const cleanName = fallbackName.charAt(0).toUpperCase() + fallbackName.slice(1)
-
-        localStorage.setItem('bokyra_logged_user', JSON.stringify({
-          name: cleanName,
-          email: formData.email.trim().toLowerCase()
-        }))
-
-        window.dispatchEvent(new Event('storage'))
-        setSuccess(`Welcome, ${cleanName}! (Demo Session)`)
-
-        setTimeout(() => {
-          navigate('/')
-        }, 1000)
-      } else {
-        setError('Invalid email or password. Please verify your credentials.')
-      }
+      setError('Invalid email or password. Please verify your credentials or register an account.')
     }
   }
 
@@ -84,8 +90,11 @@ function Login() {
             <span className="eyebrow">&bull; BOKYRA ACCESS</span>
             <h1 className="section-title">Sign In</h1>
             <p className="auth-subtitle">
-              Access your Bokyra profile, saved wishlists, and tailored orders.
+              Access your BOKYRA profile, saved wishlists, and tailored orders.
             </p>
+            <div style={{ marginTop: '10px', fontSize: '0.72rem', color: 'var(--text-muted)', background: 'var(--bg-muted)', padding: '6px 12px', borderRadius: '4px', letterSpacing: '0.04em' }}>
+              🔒 <strong>Frontend Demo:</strong> Credentials are verified client-side using simulated local sessions.
+            </div>
           </div>
 
           {error && <div className="auth-alert error">{error}</div>}

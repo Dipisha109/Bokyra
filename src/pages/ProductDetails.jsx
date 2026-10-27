@@ -88,64 +88,67 @@ function handleAddToCart() {
             <WillItFit product={product} />
 
             {product.highlights && product.highlights.length > 0 && (
-              <div style={{ margin: '20px 0', padding: '16px', background: 'var(--bg-muted)', borderRadius: '4px' }}>
-                <span style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '8px', color: 'var(--text-muted)' }}>
+              <div className="pd-specs-card">
+                <span className="pd-specs-title">
                   Architectural Specifications
                 </span>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                <ul className="pd-specs-list">
                   {product.highlights.map((h, i) => (
-                    <li key={i} style={{ fontSize: '0.85rem', color: 'var(--text-primary)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ color: '#a3723a' }}>✓</span> {h}
+                    <li key={i} className="pd-specs-item">
+                      <span className="pd-specs-bullet">✓</span>
+                      <span>{h}</span>
                     </li>
                   ))}
                 </ul>
               </div>
             )}
 
-            {/* Quantity Selector */}
-            <div className="pd-quantity">
-              <button
-                className="qty-btn"
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                disabled={quantity <= 1}
-              >
-                −
-              </button>
-              <span className="qty-value">{quantity}</span>
-              <button
-                className="qty-btn"
-                onClick={() => setQuantity(quantity + 1)}
-              >
-                +
-              </button>
-            </div>
+            {/* Purchase Controls Row */}
+            <div className="pd-purchase-row">
+              <div className="pd-quantity">
+                <button
+                  type="button"
+                  className="qty-btn"
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  disabled={quantity <= 1 || product.stockStatus === 'Sold Out'}
+                  aria-label="Decrease quantity"
+                >
+                  −
+                </button>
+                <span className="qty-value">{quantity}</span>
+                <button
+                  type="button"
+                  className="qty-btn"
+                  onClick={() => setQuantity(quantity + 1)}
+                  disabled={product.stockStatus === 'Sold Out'}
+                  aria-label="Increase quantity"
+                >
+                  +
+                </button>
+              </div>
 
-            {/* Action Buttons */}
-            <div className="pd-actions">
               <button
-                className="btn btn-primary pd-cart-btn"
+                type="button"
+                className={`btn btn-primary pd-cart-btn ${addedToCart ? 'added' : ''}`}
                 onClick={handleAddToCart}
                 disabled={product.stockStatus === 'Sold Out'}
               >
-                {/* {addedToCart ? '✓ ADDED TO CART' : `ADD TO CART — NPR ${(product.price * quantity).toLocaleString()}`} */}
                 {product.stockStatus === 'Sold Out'
                   ? 'SOLD OUT'
                   : addedToCart
-                  ? 'ADDED TO CART'
-                 : 'ADD TO CART'}
+                  ? '✓ ADDED TO BAG'
+                  : `ADD TO BAG — NPR ${(product.price * quantity).toLocaleString()}`}
               </button>
             </div>
 
-            
-              {product.customizable && product.stockStatus !== 'Sold Out' && (
-                <Link
-                  to={`/customize?productId=${product.id}`}
-                  className="btn pd-customize-btn"
-                >
-                  CUSTOMIZE THIS BAG →
-                </Link>
-              )}
-
+            {product.customizable && product.stockStatus !== 'Sold Out' && (
+              <Link
+                to={`/customize?productId=${product.id}`}
+                className="btn pd-customize-btn"
+              >
+                ✦ BESPOKE 3D CUSTOMIZER &rarr;
+              </Link>
+            )}
 
             <button
               type="button"

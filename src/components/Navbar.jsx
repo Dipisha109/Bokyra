@@ -122,7 +122,6 @@ function Navbar() {
               )}
             </div>
 
-            <Link to="/#categories" className="nav-link">Categories</Link>
             <Link to="/find-my-bag" className="nav-link">Find My Bag</Link>
             <Link to="/about" className="nav-link">About Us</Link>
           </nav>

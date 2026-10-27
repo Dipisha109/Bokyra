@@ -79,6 +79,16 @@ function Customize() {
       ? productVariantImages[selectedProduct.id].tan
       : selectedProduct.image
 
+  function handleResetCustomization() {
+    setSelectedLeather(leatherColors[0])
+    setStrapOption('standard')
+    setLaptopSleeve(false)
+    setSecretPocket(false)
+    setMonogramEnabled(true)
+    setInitials('B . K . R')
+    setStampingFinish('gold')
+  }
+
   function handleOrder() {
     const customization = {
       leather: selectedLeather.label,
@@ -206,9 +216,19 @@ function Customize() {
 
             {/* Model Info Header */}
             <div>
-              <span className="model-serial">
-                SELECT MODEL · BOKYRA COLLECTION
-              </span>
+              <div className="model-serial-row">
+                <span className="model-serial">
+                  SELECT MODEL · BOKYRA BESPOKE
+                </span>
+                <button
+                  type="button"
+                  className="customize-reset-btn"
+                  onClick={handleResetCustomization}
+                  title="Reset customization options to defaults"
+                >
+                  ↺ Reset Options
+                </button>
+              </div>
 
               <label htmlFor="customize-model" className="model-select-label">
                 Choose your bag

@@ -254,24 +254,15 @@ function Shop() {
           </div>
         </div>
 
-        {/* Quick Search Suggestions for Nepali / Everyday Users */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', margin: '-16px 0 24px', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-          <span>Popular searches:</span>
+        {/* Quick Search Suggestions */}
+        <div className="shop-popular-searches">
+          <span className="shop-popular-label">Popular searches:</span>
           {['Office bag', 'College', 'Side bag', 'Laptop', 'Travel'].map((tag) => (
             <button
               key={tag}
               type="button"
               onClick={() => setSearchQuery(tag)}
-              style={{
-                background: searchQuery.toLowerCase() === tag.toLowerCase() ? 'var(--text-primary)' : 'none',
-                color: searchQuery.toLowerCase() === tag.toLowerCase() ? 'var(--bg-primary)' : 'var(--text-secondary)',
-                border: '1px solid var(--border-light)',
-                borderRadius: '12px',
-                padding: '3px 10px',
-                fontSize: '0.75rem',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-              }}
+              className={`shop-popular-tag ${searchQuery.toLowerCase() === tag.toLowerCase() ? 'active' : ''}`}
             >
               {tag}
             </button>
@@ -296,7 +287,7 @@ function Shop() {
         </div>
 
         {/* Filter Categories: Purpose */}
-        <div className="filter-group" style={{ marginTop: '16px' }}>
+        <div className="filter-group filter-group-purpose">
           <span className="filter-group-title">Purpose:</span>
           <div className="shop-filters">
             {purposeCategories.map((purpose) => (

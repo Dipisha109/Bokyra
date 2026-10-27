@@ -31,6 +31,10 @@ export function ShopProvider({ children }) {
 
   
   function addToCart(product, quantity = 1) {
+    if (!product || product.stockStatus === 'Sold Out') {
+      return
+    }
+
     setCart((currentCart) => {
       const existingItem = currentCart.find(
         (item) =>

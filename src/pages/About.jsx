@@ -46,8 +46,8 @@ function About() {
                 <span className="about-stat-text">Hand Assembly Steps</span>
               </div>
               <div className="about-stat-box">
-                <span className="about-stat-num">10-Yr</span>
-                <span className="about-stat-text">Atelier Guarantee</span>
+                <span className="about-stat-num">Lifetime</span>
+                <span className="about-stat-text">Craft Guarantee</span>
               </div>
             </div>
           </div>

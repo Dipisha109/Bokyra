@@ -229,7 +229,13 @@ function FindMyBag() {
                     <span className={`fmb-match-pill ${idx === 0 ? 'top-match' : ''}`}>
                       {idx === 0 ? '★ BEST MATCH' : `RUNNER UP #${idx + 1}`} &bull; {product.matchScore}% FIT
                     </span>
-                    <span className="fmb-liters-pill">{product.displayCategory}</span>
+                    {product.stockStatus === 'Sold Out' ? (
+                      <span className="stock-status sold-out" style={{ fontSize: '0.72rem', fontWeight: 700, padding: '3px 8px', borderRadius: '4px', background: '#ffebeb' }}>
+                        Sold Out
+                      </span>
+                    ) : (
+                      <span className="fmb-liters-pill">{product.displayCategory}</span>
+                    )}
                   </div>
 
                   <div className="fmb-card-media">
