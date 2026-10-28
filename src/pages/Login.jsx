@@ -1,7 +1,9 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 
 function Login() {
+  const location = useLocation()
+  const destination = location.state?.from?.pathname || '/'
   const navigate = useNavigate()
 
   const [formData, setFormData] = useState({
@@ -74,7 +76,7 @@ function Login() {
       setSuccess(`Welcome back, ${matchedUser.name}!`)
 
       setTimeout(() => {
-        navigate('/')
+        navigate(destination, { replace: true })
       }, 1000)
     } else {
       setError('Invalid email or password. Please verify your credentials or register an account.')
@@ -136,7 +138,12 @@ function Login() {
 
           <div className="auth-footer">
             Don't have a Bokyra account yet?{' '}
-            <Link to="/register">Create Account</Link>
+            <Link
+              to="/register"
+              state={{ from: location.state?.from }}
+            >
+              Create Account
+            </Link>
           </div>
 
         </div>

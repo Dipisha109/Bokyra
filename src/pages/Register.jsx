@@ -1,7 +1,9 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 
 function Register() {
+  const location = useLocation()
+  const destination = location.state?.from?.pathname || '/'
   const navigate = useNavigate()
 
   // Controlled component state for inputs
@@ -86,7 +88,7 @@ function Register() {
     setSuccess('BOKYRA profile created successfully (Demo Session). Redirecting...')
 
     setTimeout(() => {
-      navigate('/')
+      navigate(destination, { replace: true })
     }, 1000)
   }
 
