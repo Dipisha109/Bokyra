@@ -28,6 +28,8 @@ function Checkout() {
 
   // Payment method selection ('cod' or 'digital')
   const [paymentMethod, setPaymentMethod] = useState('cod')
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [paymentError, setPaymentError] = useState('')
 
   // Calculation
   const subtotal = cart.reduce(
@@ -42,10 +44,17 @@ function Checkout() {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  function handleSubmit(e) {
+  
+  async function handleSubmit(e) {
     e.preventDefault()
 
+    if (isProcessing) return
+
+    setIsProcessing(true)
+    setPaymentError('')
+
     const orderId = `BKR-${Date.now().toString().slice(-6)}`
+
     const orderData = {
       orderId,
       date: new Date().toLocaleDateString('en-US', {
@@ -59,17 +68,63 @@ function Checkout() {
       subtotal,
       deliveryFee,
       total: finalTotal,
+      paymentStatus: paymentMethod === 'cod' ? 'pending' : 'initiated',
     }
 
-    // Save order details to localStorage for the Order Confirmation page
-    localStorage.setItem('bokyra_latest_order', JSON.stringify(orderData))
+    // Cash on Delivery: keep the existing order flow
+    if (paymentMethod === 'cod') {
+      localStorage.setItem(
+        'bokyra_latest_order',
+        JSON.stringify(orderData)
+      )
 
-    // Clear the cart
-    clearCart()
+      clearCart()
+      navigate('/order-confirmation')
+      return
+    }
 
-    // Navigate to Order Confirmation
-    navigate('/order-confirmation')
+    // Digital payment: ask the backend to initiate Khalti
+    try {
+      const response = await fetch(
+        'http://localhost:5000/api/khalti/initiate',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            orderId,
+            amount: Math.round(finalTotal * 100),
+          }),
+        }
+      )
+
+      const data = await response.json()
+
+      if (!response.ok || !data.payment_url || !data.pidx) {
+        throw new Error(
+          data.error || 'Could not start Khalti payment.'
+        )
+      }
+
+      // Save the pending order for the return flow.
+      // This does not mean the payment has succeeded.
+      orderData.khaltiPidx = data.pidx
+
+      localStorage.setItem(
+        'bokyra_latest_order',
+        JSON.stringify(orderData)
+      )
+
+      window.location.href = data.payment_url
+    } catch (error) {
+      setPaymentError(
+        error.message || 'Unable to start payment. Please try again.'
+      )
+      setIsProcessing(false)
+    }
   }
+
 
   // If cart is empty, redirect user gently
   if (cart.length === 0) {
@@ -229,11 +284,24 @@ function Checkout() {
                 </div>
               </div>
 
-              <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '16px' }}>
-                {paymentMethod === 'cod'
+              {paymentError && (
+              <p role="alert" style={{ color: 'red', marginBottom: '12px' }}>
+                {paymentError}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              className="btn btn-primary"
+              style={{ width: '100%', padding: '16px' }}
+              disabled={isProcessing}
+            >
+              {isProcessing
+                ? 'REDIRECTING TO PAYMENT...'
+                : paymentMethod === 'cod'
                   ? 'CONFIRM ORDER (CASH ON DELIVERY) →'
-                  : 'CONFIRM SIMULATED PAYMENT →'}
-              </button>
+                  : 'PAY WITH KHALTI →'}
+            </button>
             </form>
           </section>
 

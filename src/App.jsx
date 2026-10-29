@@ -15,6 +15,7 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import NotFound from './pages/NotFound'
 import OrderConfirmation from './pages/OrderConfirmation'
+import PaymentResult from './pages/PaymentResult'
 import ProductDetails from './pages/ProductDetails'
 import Register from './pages/Register'
 import Shop from './pages/Shop'
@@ -50,6 +51,7 @@ function App() {
             <Route path="/checkout" element={<RequireAuth><Checkout /></RequireAuth>} />
             <Route path="/order-confirmation" element={<OrderConfirmation />} />
             <Route path="*" element={<NotFound />} />
+            <Route path="/payment-result" element={<PaymentResult />} />
           </Routes>
         </div>
 

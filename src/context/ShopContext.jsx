@@ -1,5 +1,11 @@
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react'
 
 const ShopContext = createContext()
 
@@ -29,7 +35,6 @@ export function ShopProvider({ children }) {
     localStorage.setItem('bokyra_wishlist', JSON.stringify(wishlist))
   }, [wishlist])
 
-  
   function addToCart(product, quantity = 1) {
     if (!product || product.stockStatus === 'Sold Out') {
       return
@@ -61,8 +66,6 @@ export function ShopProvider({ children }) {
     })
   }
 
-
-
   function addCustomizedToCart(product, customization, totalPrice) {
     const customizedProduct = {
       ...product,
@@ -79,7 +82,6 @@ export function ShopProvider({ children }) {
       },
     ])
   }
-
 
   function removeFromCart(cartItemId) {
     setCart((currentCart) =>
@@ -99,7 +101,6 @@ export function ShopProvider({ children }) {
     )
   }
 
-
   function toggleWishlist(productId) {
     setWishlist((currentWishlist) =>
       currentWishlist.includes(productId)
@@ -108,9 +109,10 @@ export function ShopProvider({ children }) {
     )
   }
 
-  function clearCart() {
+  // Keep this function reference stable between renders.
+  const clearCart = useCallback(() => {
     setCart([])
-  }
+  }, [])
 
   const cartCount = cart.reduce(
     (total, item) => total + item.quantity,
@@ -138,8 +140,10 @@ export function ShopProvider({ children }) {
 
 export function useShop() {
   const context = useContext(ShopContext)
+
   if (!context) {
     throw new Error('useShop must be used inside <ShopProvider>')
   }
+
   return context
 }
