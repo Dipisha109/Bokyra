@@ -184,13 +184,27 @@ function OrderConfirmation() {
           <div style={{ maxWidth: '320px', marginLeft: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
               <span style={{ color: 'var(--text-secondary)' }}>Subtotal</span>
-              <span>NPR {order.subtotal.toLocaleString()}</span>
+              <span>NPR {Number(order.subtotal).toLocaleString()}</span>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
               <span style={{ color: 'var(--text-secondary)' }}>Delivery Fee</span>
-              <span>{order.deliveryFee === 0 ? 'Complimentary' : `NPR ${order.deliveryFee}`}</span>
+              <span>{Number(order.deliveryFee) === 0 ? 'Complimentary' : `NPR ${Number(order.deliveryFee).toLocaleString()}`}</span>
             </div>
+
+            {order.discount > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: '#137333' }}>
+                <span>
+                  Promo Discount
+                  {order.promoCode && (
+                    <span style={{ marginLeft: '6px', fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.06em', background: '#e6f4ea', padding: '2px 6px', borderRadius: '2px' }}>
+                      {order.promoCode}
+                    </span>
+                  )}
+                </span>
+                <span>− NPR {Number(order.discount).toLocaleString()}</span>
+              </div>
+            )}
 
             <div
               style={{
@@ -203,9 +217,15 @@ function OrderConfirmation() {
                 marginTop: '6px',
               }}
             >
-              <span>Total Paid / Due</span>
-              <span>NPR {order.total.toLocaleString()}</span>
+              <span>Total {order.paymentStatus === 'paid' ? 'Paid' : 'Due'}</span>
+              <span>NPR {Number(order.total).toLocaleString()}</span>
             </div>
+
+            {order.khaltiTransactionId && (
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '4px', textAlign: 'right' }}>
+                Khalti Txn: {order.khaltiTransactionId}
+              </div>
+            )}
           </div>
         </div>
 

@@ -85,10 +85,11 @@ import Register from './pages/Register'
 import Shop from './pages/Shop'
 import Wishlist from './pages/Wishlist'
 
-import AdminLogin from './admin/AdminLogin'
-import AdminLayout from './admin/AdminLayout'
 import AdminDashboard from './admin/AdminDashboard'
+import AdminLayout from './admin/AdminLayout'
+import AdminLogin from './admin/AdminLogin'
 import AdminOrders from './admin/AdminOrders'
+import AdminPromotions from './admin/AdminPromotions'
 
 function AppContent() {
   const location = useLocation()
@@ -124,6 +125,7 @@ function AppContent() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="orders" element={<AdminOrders />} />
+            <Route path="promotions" element={<AdminPromotions />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

@@ -57,7 +57,7 @@ function AdminLayout() {
           <NavLink end to="/admin">Overview</NavLink>
           <NavLink to="/admin/orders">Orders</NavLink>
           <span title="Available in a later stage" style={{ color: '#9b978e', padding: '11px 12px', fontSize: 14 }}>Products · Later</span>
-          <span title="Available in a later stage" style={{ color: '#9b978e', padding: '11px 12px', fontSize: 14 }}>Promotions · Later</span>
+          <NavLink to="/admin/promotions">Promotions</NavLink>
           <span title="Available in a later stage" style={{ color: '#9b978e', padding: '11px 12px', fontSize: 14 }}>Customers · Later</span>
           <span title="Available in a later stage" style={{ color: '#9b978e', padding: '11px 12px', fontSize: 14 }}>Reports · Later</span>
         </nav>
